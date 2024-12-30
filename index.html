@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Parser </title>
+    <script src="parser.js"></script>
+    
+</head>
+<body>
+    <h1>Parser Query SQL  WebAssembly</h1>
+    <form id="parser_form">
+        
+        <label for="input2">SQL query:</label><br>
+        <textarea id="input2" rows="4" cols="50">
+
+            SELEXT
+    l_returnflag,
+    l_linestatus,
+    sum(l_quantity) AS sum_qty,
+    sum(l_extendedprice) AS sum_base_price,
+    sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price,
+    sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge,
+    avg(l_quantity) AS avg_qty,
+    avg(l_extendedprice) AS avg_price,
+    avg(l_discount) AS avg_disc,
+    count(*) AS count_order
+FROM
+    lineitem
+WHERE
+    l_shipdate <= CAST('1998-09-02' AS date)
+GROUP BY
+    l_returnflag,
+    l_linestatus
+ORDER BY
+    l_returnflag     l_linestatus;
+
+        </textarea><br><br>
+
+        <button type="button" onclick="parseQuery()">Parse Query</button>
+        
+    </form>
+
+    <h2>Results</h2>
+    <p>Parsing results: <span id="result1"> </span></p>
+    
+    <script>
+            let parseInput = null;
+            let countWord = null;
+
+
+    Module.onRuntimeInitialized = () => {
+        parseInput = Module.cwrap('parseInput', 'string', ['string', 'string']);
+
+        countWord = Module.cwrap('wordcount', 'number', [ 'string']);
+    };
+
+        function parseQuery() {
+            const input1 = "sql.gram";
+            const input2 = document.getElementById('input2').value.trim();
+
+            var count1=parseInput(input1, input2);
+            console.log(input1);
+            console.log(input2);
+            console.log(count1);
+            console.log("----------------");
+
+            document.getElementById('result1').textContent = count1;
+            
+        }
+        function word_count(){
+            const input1 = document.getElementById('input1').value.trim();
+            const count1=countWord(input1);
+            document.getElementById('result1').textContent = count1;
+
+        }
+    </script>
+</body>
+</html>
